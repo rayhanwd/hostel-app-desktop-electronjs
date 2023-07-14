@@ -11,6 +11,7 @@ function createWindow() {
         icon: ""
     });
      
+    mainWindow.setMenu(null);
 
     mainWindow.loadURL(
         isDev
