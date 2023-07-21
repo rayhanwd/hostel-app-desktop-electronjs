@@ -56,10 +56,9 @@
     "eject-react": "react-scripts eject",
     "build-electron": "electron-builder",
     "build": "yarn build-react && yarn build-electron -wml",
-    "start": "npm run tailwind-compile & concurrently \"cross-env BROWSER=none yarn start-react\" \"wait-on http://localhost:3000 && electron .\"",
+    "start": "npm run tailwind-compile && concurrently \"cross-env BROWSER=none yarn start-react\" \"wait-on http://localhost:3000 && electron .\"",
     "tailwind-compile": "npx tailwindcss build src/styles/tailwind.css -o public/styles/output.css"
   },
-  
   "eslintConfig": {
     "extends": "react-app"
   },

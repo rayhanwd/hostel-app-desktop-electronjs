@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 const foodController = require('../foods/foods.controller');
 const studentController = require('../students/students.controller');
+// const distributionController = require('../distribution/distribution.controller');
+
 
 /* GET home page. */
 router.get('/', function (req, res) {
@@ -21,6 +23,24 @@ router.get('/students', studentController.getStudent);
 router.get('/students/:id', studentController.getStudentById);
 router.put('/students/:id', studentController.updateStudentById);
 router.delete('/students/:id', studentController.deleteStudentById);
+
+// distribution routes
+
+// // Create a new distribution
+// router.post('/', distributionController.createDistribution);
+
+// // Get all distributions
+// router.get('/', distributionController.getAllDistributions);
+
+// // Get a single distribution by ID
+// router.get('/:id', distributionController.getDistributionById);
+
+// // Update a distribution by ID
+// router.put('/:id', distributionController.updateDistributionById);
+
+// // Delete a distribution by ID
+// router.delete('/:id', distributionController.deleteDistributionById);
+
 
 module.exports = router;
 
