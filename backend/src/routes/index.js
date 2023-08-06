@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 const foodController = require('../foods/foods.controller');
 const studentController = require('../students/students.controller');
-// const distributionController = require('../distribution/distribution.controller');
-
+const countController = require('../documentsCount/documentcount.controllers');
+const DistributionController = require('../distribution/distribution.controller');
 
 /* GET home page. */
 router.get('/', function (req, res) {
@@ -13,6 +13,7 @@ router.get('/', function (req, res) {
 //food routes
 router.post('/foods', foodController.createFood);
 router.get('/foods', foodController.getFood);
+router.get('/foods/all', foodController.getAllFood);
 router.get('/foods/:id', foodController.getFoodById);
 router.put('/foods/:id', foodController.updateFoodById);
 router.delete('/foods/:id', foodController.deleteFoodById);
@@ -23,24 +24,15 @@ router.get('/students', studentController.getStudent);
 router.get('/students/:id', studentController.getStudentById);
 router.put('/students/:id', studentController.updateStudentById);
 router.delete('/students/:id', studentController.deleteStudentById);
+// count documents
 
-// distribution routes
+router.get("/totalcounts",countController.getCounts);
 
-// // Create a new distribution
-// router.post('/', distributionController.createDistribution);
-
-// // Get all distributions
-// router.get('/', distributionController.getAllDistributions);
-
-// // Get a single distribution by ID
-// router.get('/:id', distributionController.getDistributionById);
-
-// // Update a distribution by ID
-// router.put('/:id', distributionController.updateDistributionById);
-
-// // Delete a distribution by ID
-// router.delete('/:id', distributionController.deleteDistributionById);
-
-
+router.post('/distribution/create', DistributionController.createDistributionData);
+router.get('/distribution/data', DistributionController.getDistributionData);
+router.get('/distribution/search', DistributionController.searchDistributionDataByName);
+router.put('/distribution/update/:id', DistributionController.updateDistributionDataById);
 module.exports = router;
+
+
 

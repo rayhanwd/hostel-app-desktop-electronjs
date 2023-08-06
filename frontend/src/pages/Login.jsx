@@ -22,7 +22,7 @@ const Login = () => {
                 url: `http://localhost:5000/users/login`,
                 data: data
             });
-
+    
             toast(res.data.message, {
                 position: "top-right",
                 autoClose: 5000,
@@ -31,7 +31,7 @@ const Login = () => {
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-            });
+                });
 
             if (res.status === 200) {
                 setLoading(false);

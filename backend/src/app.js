@@ -6,6 +6,7 @@ require('dotenv').config({ path: `${__dirname}/../.env` });
 //import routes
 const indexRouter = require('./routes');
 const userRouter = require('./routes/users');
+
 require('./db/db');
 
 //create app
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({
   extended: false
 }));
+
 
 //decleare all route by path
 app.use('/',indexRouter);

@@ -1,92 +1,200 @@
 const Distribution = require('./distribution.model');
+const Student = require('../students/students.model');
 
-// Create a new distribution
-exports.createDistribution = async (req, res) => {
+
+const createDistributionData = async (req, res) => {
   try {
-    const distributionData = req.body;
-    const newDistribution = await Distribution.create(distributionData);
-    res.status(201).json(newDistribution);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create distribution' });
-  }
-};
+    const { foodName, meals } = req.body;
 
-exports.getAllDistributions = async (req, res) => {
-    try {
-      // Pagination options
-      const page = parseInt(req.query.page) || 1; // Current page, default to 1
-      const limit = parseInt(req.query.limit) || 10; // Number of items per page, default to 10
-  
-      // Filtering options
-      const filterOptions = {};
-      // Add filtering conditions based on query parameters, if needed
-      // Example: filter by status - http://localhost:3000/distributions?page=1&limit=10&status=served
-      if (req.query.status) {
-        filterOptions.status = req.query.status;
-      }
-  
-      // Fetch distributions based on pagination and filtering options
-      const distributions = await Distribution.find(filterOptions)
-        .skip((page - 1) * limit)
-        .limit(limit);
-  
-      // Count the total number of distributions to calculate the total pages
-      const totalDistributions = await Distribution.countDocuments(filterOptions);
-  
-      res.status(200).json({
-        totalDistributions,
-        totalPages: Math.ceil(totalDistributions / limit),
-        currentPage: page,
-        distributions,
+    const now = new Date();
+    const date = now.toISOString().slice(0, 10);
+
+    let meal;
+    if (meals === 'Breakfast') {
+      meal = 0; // Breakfast meal
+    } else if (meals === 'Lunch') {
+      meal = 1; // Lunch meal
+    } else if (meals === 'Dinner') {
+      meal = 2; // Dinner meal
+    } else {
+
+      return res.status(400).json({ message: 'Invalid meal type provided.' });
+    }
+
+    const existingDistributionData = await Distribution.find({
+      date: date,
+      meal: meal,
+    });
+
+    if (existingDistributionData.length > 0) {
+      return res.status(200).json({ message: 'Distribution data already exists for today.', data: existingDistributionData });
+    }
+
+    const students = await Student.find().select('_id').exec();
+
+
+    const createdDistributionForms = [];
+
+    for (const student of students) {
+      const distributionForm = new Distribution({
+        student: student._id,
+        meal: meal,
+        recepe: foodName,
+        date: date,
+        isServed: false
       });
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch distributions' });
-    }
-  };
-  
 
-// Get a single distribution by ID
-exports.getDistributionById = async (req, res) => {
-  try {
-    const distribution = await Distribution.findById(req.params.id);
-    if (!distribution) {
-      return res.status(404).json({ error: 'Distribution not found' });
+      const createdForm = await distributionForm.save();
+      createdDistributionForms.push(createdForm);
     }
-    res.status(200).json(distribution);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch distribution' });
+
+    res.status(201).json({ message: 'Distribution forms created successfully.', data: createdDistributionForms });
+
+
+  } catch (err) {
+
+    console.error('Error creating distribution forms:', err);
+    res.status(500).json({ message: 'Failed to create distribution forms.', data: null });
   }
 };
 
-// Update a distribution by ID
-exports.updateDistributionById = async (req, res) => {
+const getDistributionData = async (req, res) => {
   try {
-    const distributionData = req.body;
-    const updatedDistribution = await Distribution.findByIdAndUpdate(
-      req.params.id,
-      distributionData,
-      { new: true }
-    );
-    if (!updatedDistribution) {
-      return res.status(404).json({ error: 'Distribution not found' });
+    const now = new Date();
+
+    let meal;
+    if (now.getHours() >= 8 && now.getHours() < 11) {
+      meal = "0"; // Breakfast
+    } else if (now.getHours() >= 11 && now.getHours() < 17) {
+      meal = "1"; // Lunch
+    } else if (now.getHours() >= 22 && now.getHours() < 24) {
+      meal = "2"; // Dinner
+    } else {
+      meal = "-1";
     }
-    res.status(200).json(updatedDistribution);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update distribution' });
+
+    if (meal === "-1") {
+      return res.status(200).json({ message: 'Meal distribution has been closed. Please wait for the next scheduling', data: [] });
+    }
+
+    const filteredDistributionData = await Distribution.find({
+      meal: meal,
+      date: { $gte: new Date(now.toISOString().slice(0, 10)), $lte: new Date(now.toISOString().slice(0, 10)) },
+    })
+      .populate('student', 'fullName')
+      .exec();
+
+    res.status(200).json({ message: 'Latest distribution data retrieved successfully.', data: filteredDistributionData });
+
+  } catch (err) {
+    console.error('Error fetching distribution data:', err);
+    res.status(500).json({ message: 'Failed to fetch distribution data.', data: null });
   }
 };
 
-// Delete a distribution by ID
-exports.deleteDistributionById = async (req, res) => {
+const searchDistributionDataByName = async (req, res) => {
   try {
-    const deletedDistribution = await Distribution.findByIdAndDelete(
-      req.params.id
-    );
-    if (!deletedDistribution) {
-      return res.status(404).json({ error: 'Distribution not found' });
+    const searchTerm = req.query.name;
+
+    if (!searchTerm) {
+      return res.status(400).json({ message: 'Please provide a search term.', data: [] });
     }
-    res.status(200).json({ message: 'Distribution deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete distribution' });
+
+    const student = await Student.findOne({ fullName: { $regex: searchTerm, $options: 'i' } });
+
+    if (!student) {
+      return res.status(200).json({ message: 'Student not found.', data: [] });
+    }
+
+    const filteredDistributionData = await Distribution.find({ student: student._id })
+      .populate('student', 'fullName')
+      .exec();
+
+    res.status(200).json({ message: 'Filtered distribution data retrieved successfully.', data: filteredDistributionData });
+
+  } catch (err) {
+    console.error('Error fetching distribution data:', err);
+    res.status(500).json({ message: 'Failed to fetch distribution data.', data: null });
   }
+};
+
+
+const updateDistributionDataById = async (req, res) => {
+
+  try {
+    const distributionId = req.params.id;
+
+    if (!distributionId) {
+      return res.status(400).json({ message: 'Please provide a valid distribution ID.' });
+    }
+
+    const distributionData = await Distribution.findById(distributionId);
+
+    if (!distributionData) {
+      return res.status(404).json({ message: 'Distribution data not found.' });
+    }
+
+    distributionData.isServed = !distributionData.isServed;
+    await distributionData.save();
+
+    const now = new Date();
+    let meal;
+    if (now.getHours() >= 8 && now.getHours() < 11) {
+      meal = "0"; // Breakfast
+    } else if (now.getHours() >= 11 && now.getHours() < 17) {
+      meal = "1"; // Lunch
+    } else if (now.getHours() >= 22 && now.getHours() < 24) {
+      meal = "2"; // Dinner
+    } else {
+      meal = "-1";
+    }
+
+    if (meal === "-1") {
+      return res.status(200).json({ message: 'Meal distribution has been closed. Please wait for the next scheduling.', data: [] });
+    }
+
+    const filteredDistributionData = await Distribution.find({
+      meal: meal,
+      date: { $gte: new Date(now.toISOString().slice(0, 10)), $lte: new Date(now.toISOString().slice(0, 10)) },
+    })
+      .populate('student', 'fullName')
+      .exec();
+
+    res.status(200).json({ message: 'Distribution data updated and filtered successfully.', data: filteredDistributionData });
+
+  } catch (err) {
+    console.error('Error updating distribution data:', err);
+    res.status(500).json({ message: 'Failed to update distribution data.', data: null });
+  }
+};
+
+const searchDistributionDataByDate = async (req, res) => {
+  try {
+    const { date } = req.body;
+    const inputDate = new Date(date);
+    if (isNaN(inputDate.getTime())) {
+      return res.status(400).json({ error: 'Invalid date format. Please provide a valid date.' });
+    }
+
+
+    const distributionData = await Distribution.find({ date: inputDate })
+      .populate('food', 'name');
+
+    if (!distributionData || distributionData.length === 0) {
+      return res.status(404).json({ error: 'No distribution data found for the specified date.' });
+    }
+    return res.status(200).json({ data: distributionData });
+  } catch (error) {
+    console.error('Error searching distribution data:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+module.exports = {
+  createDistributionData,
+  getDistributionData,
+  searchDistributionDataByName,
+  updateDistributionDataById,
+  searchDistributionDataByDate
 };

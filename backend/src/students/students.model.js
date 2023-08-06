@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-//Student(id, fullName, roll, age, class, hall, status)
+
 const studentSchema = new Schema({
     id: {
         type: String,

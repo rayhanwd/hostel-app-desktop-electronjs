@@ -55,7 +55,7 @@
     "test-react": "react-scripts test --env=jsdom",
     "eject-react": "react-scripts eject",
     "build-electron": "electron-builder",
-    "build": "yarn build-react && yarn build-electron -wml",
+    "build": "yarn build-react && yarn build-electron -wl",
     "start": "npm run tailwind-compile && concurrently \"cross-env BROWSER=none yarn start-react\" \"wait-on http://localhost:3000 && electron .\"",
     "tailwind-compile": "npx tailwindcss build src/styles/tailwind.css -o public/styles/output.css"
   },
