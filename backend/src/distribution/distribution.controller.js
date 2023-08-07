@@ -84,7 +84,11 @@ const getDistributionData = async (req, res) => {
       .populate('student', 'fullName')
       .exec();
 
-    res.status(200).json({ message: 'Latest distribution data retrieved successfully.', data: filteredDistributionData });
+      if (filteredDistributionData.length === 0) {
+        res.status(200).json({ message: 'You do not have any created form for today.',data:[] });
+      } else {
+        res.status(200).json({ message: 'Latest distribution data retrieved successfully.', data: filteredDistributionData });
+      }
 
   } catch (err) {
     console.error('Error fetching distribution data:', err);
