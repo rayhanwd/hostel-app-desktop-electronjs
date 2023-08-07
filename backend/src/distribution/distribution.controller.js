@@ -67,7 +67,7 @@ const getDistributionData = async (req, res) => {
       meal = "0"; // Breakfast
     } else if (now.getHours() >= 11 && now.getHours() < 17) {
       meal = "1"; // Lunch
-    } else if (now.getHours() >= 22 && now.getHours() < 24) {
+    } else if (now.getHours() >= 20 && now.getHours() < 24) {
       meal = "2"; // Dinner
     } else {
       meal = "-1";

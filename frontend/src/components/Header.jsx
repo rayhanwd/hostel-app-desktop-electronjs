@@ -12,7 +12,7 @@ const Header = () => {
                 <div className="flex items-center mx-5">
                     <Link to="/dashboard" className="flex items-center cursor-pointer">
                         <GiBarbecue className="text-4xl mr-3 text-green-600" />
-                        <h1 className="text-2xl font-bold mr-12 text-green-600">Yooda Hostel</h1>
+                        <h1 className="text-2xl font-bold mr-12 text-green-600">BUBT Hostel</h1>
                     </Link>
                     <button onClick={() => handleToggle()} className="toggle-sidebar-btn"><FaBars className="text-2xl text-green-600" />
                     </button>

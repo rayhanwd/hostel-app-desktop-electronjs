@@ -78,17 +78,18 @@ const FoodList = () => {
 
   const editHandler = (food) => {
     setEdit(true);
-    setEditFood(food)
+    setEditFood(food);
   }
 
-  const data = {
-    id: foodId,
-    name: foodName,
-    price: foodPrice,
-  }
+
 
   const EditFood = async () => {
-    setLoading(true)
+    setLoading(true);
+      const data = {
+    id: foodId ? foodId : editFood.id,
+    name: foodName ? foodName : editFood.foodName,
+    price: foodPrice ? foodPrice : editFood.foodPrice,
+  }
     try {
       const res = await axios({
         method: 'put',
@@ -114,7 +115,7 @@ const FoodList = () => {
       const res = await axios({
         method: 'delete',
         url: `http://localhost:5000/foods/${deletedFood._id}`,
-        data: data
+        data: {}
       });
 
       if (res) {
@@ -129,7 +130,7 @@ const FoodList = () => {
 
   return (
     <section className="container mx-auto px-4 sm:px-8 max-w-100">
-      <div className="py-8">
+      <div className="py-8 relative">
         <div className="flex flex-row mb-1 sm:mb-0 justify-between w-full">
           <h2 className="text-xl font-bold">
             Food List
@@ -165,7 +166,7 @@ const FoodList = () => {
                   <th scope="col" className="px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal">
                     Food Price $
                   </th>
-                
+
                   <th scope="col" className="px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-center text-sm uppercase font-normal">
                     Action
                   </th>
@@ -192,7 +193,7 @@ const FoodList = () => {
                           {food.price}
                         </p>
                       </td>
-                      
+
                       <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                         <button onClick={() => editHandler(food)} className="text-green-600 hover:text-green-900 mx-2">
                           Edit
@@ -218,9 +219,9 @@ const FoodList = () => {
             </div>}
 
             {edit && (
-              <div className="fixed inset-0 flex items-center justify-center z-50">
-                <div onClick={() => setEdit(false)} className="fixed inset-0 bg-gray-900 opacity-80"></div>
-                <div className="bg-white p-6 rounded shadow-lg relative w-6/12">
+              <div className=" flex items-center justify-center z-50">
+                <div onClick={() => setEdit(false)} className="inset-0 bg-gray-900 opacity-80"></div>
+                <div className="bg-white p-6 rounded shadow-lg relative w-6/12 top-0">
                   <div className="text-right">
                     <button className="ml-auto" onClick={() => setEdit(false)}><IoMdClose className="text-right text-xl" /></button>
                   </div>
@@ -252,9 +253,9 @@ const FoodList = () => {
           </div>
         </div>
         {deleted && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div onClick={() => setDeleted(false)} className="fixed inset-0 bg-gray-900 opacity-80"></div>
-            <div className="bg-white p-6 rounded shadow-lg relative">
+          <div className="relative inset-0 flex items-center justify-center z-50 bottom-20">
+            <div onClick={() => setDeleted(false)} className="relative inset-0 bg-gray-900 opacity-80"></div>
+            <div className="bg-white p-6 rounded shadow-lg relative top-20">
               <p className="text-center text-lg font-medium py-6">Are you sure? To remove this</p>
               <div className="flex items-center justify-center">
                 <button className="text-white py-2 px-6 rounded-sm mr-10 bg-orange-600" onClick={() => DeleteFood()}>Yes</button>

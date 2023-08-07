@@ -24,7 +24,7 @@ const StudentList = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [search, setSearch] = useState(false);
 
-
+  console.log(edit)
   const fecthStudents = async () => {
     setnotfound(false);
     setSearch(false);
@@ -85,17 +85,19 @@ const StudentList = () => {
     setEditStudent(std);
   }
   // edit student
-  const data = {
-    id: stdId,
-    fullName: name,
-    roll: roll,
-    age: age,
-    class: Class,
-    hall: HallName,
-    status: status,
-  }
+
   const EditStudent = async () => {
-    setLoading(true)
+    setLoading(true);
+    const data = {
+      id: stdId ? stdId : editStudent.id,
+      fullName: name ? name : editStudent.fullName,
+      roll: roll ? roll : editStudent.roll,
+      age: age ? age : editStudent.age,
+      class: Class ? Class : editStudent.class,
+      hall: HallName ? HallName : editStudent.hall,
+      status: status ? status : editStudent.status,
+    }
+
     try {
       const res = await axios({
         method: 'put',
@@ -127,7 +129,7 @@ const StudentList = () => {
       const res = await axios({
         method: 'delete',
         url: `http://localhost:5000/students/${deletedStudent._id}`,
-        data: data
+        data: {}
       });
 
       if (res) {
@@ -273,7 +275,7 @@ const StudentList = () => {
           </div>
           {/* edit stduent */}
           {edit && (
-            <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className=" flex items-center justify-center z-50">
               <div onClick={() => setEdit(false)} className="fixed inset-0 bg-gray-900 opacity-80"></div>
               <div className="bg-white p-6 rounded shadow-lg relative w-6/12">
                 <div className="text-right">
@@ -344,7 +346,7 @@ const StudentList = () => {
       </div>
 
       {deleted && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="flex items-center justify-center z-50">
           <div onClick={() => setDeleted(false)} className="fixed inset-0 bg-gray-900 opacity-80"></div>
           <div className="bg-white p-6 rounded shadow-lg relative">
             <p className="text-center text-lg font-medium py-6">Are you sure? To remove this</p>

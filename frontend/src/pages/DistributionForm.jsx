@@ -265,7 +265,7 @@ const DistributionForm = () => {
                 }
             </div>
             {isOpen && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div className=" flex items-center justify-center z-50">
                     <div onClick={() => setIsOpen(false)} className="fixed inset-0 bg-gray-900 opacity-80"></div>
                     <div className="bg-white p-6 rounded shadow-lg relative">
                         <h2 className="text-2xl font-bold mb-4">Make a recepie by food</h2>

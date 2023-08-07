@@ -643,8 +643,20 @@ video {
   bottom: 0px;
 }
 
+.bottom-20 {
+  bottom: 5rem;
+}
+
 .right-0 {
   right: 0px;
+}
+
+.top-0 {
+  top: 0px;
+}
+
+.top-20 {
+  top: 5rem;
 }
 
 .z-10 {
